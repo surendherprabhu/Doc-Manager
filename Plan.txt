@@ -1,0 +1,7 @@
+> check what the operating system is
+
+> access the users document folder
+
+> view contents of the document folder
+
+> add or edit
