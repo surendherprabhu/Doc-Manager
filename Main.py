@@ -9,4 +9,4 @@ from App import *
 os = str(platform.system())
 OS = (OS_Dict[os])
 
-App(OS)
+App(OS , directory="SAMPEL")
