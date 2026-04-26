@@ -9,4 +9,6 @@ from App import *
 os = str(platform.system())
 OS = (OS_Dict[os])
 
-App(OS , directory="SAMPEL")
+app =  App(OS = 0,directory="sample")
+app.create("folder1")
+
