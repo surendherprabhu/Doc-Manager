@@ -44,7 +44,6 @@ class App():
             result += f"{index}. {file}" + "\n"
          return result
             
-              
          
     def move_file(self ,index, destination):
          self.index = index
@@ -52,7 +51,8 @@ class App():
 
          os.replace(f"{self.directory}/{self.file_list[self.index]}" , f"{self.destination}/{self.file_list[self.index]}")
               
-                    
+    def sort():
+        pass
             
         
     
