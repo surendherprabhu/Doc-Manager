@@ -27,12 +27,32 @@ class App():
          try:
              os.mkdir(path)
              print(f"Directory {name} created at {directory} successfully")
+             self.new_folder = name
          except OSError as error:
              print(f"Directory '{path}' could not be created: {error}")
-    
         
+         with os.scandir(path) as dir:
+             if not dir:
+                 image = os.path.join(path,"Images")
+                 os.mkdir(image)
+                 document = os.path.join(path,"Documents")
+                 os.mkdir(document)
+                 video = os.path.join(path,"Videos")
+                 os.mkdir(video)
+                 applications = os.path.join(path,"Apps")
+                 os.mkdir(applications)
+                 audio = os.path.join(path,"Audio")
+                 os.mkdir(audio)
+                 programming = os.path.join(path,"Code")
+                 os.mkdir(programming)
+             else:
+                 pass
+         self.path = path
+
+            
     def get_contents(self):
-        with os.scandir(self.directory) as dir:
+        self.create()
+        with os.scandir(self.path) as dir:
             for element in dir:
                 self.file_list.append(element.name)
             return self.file_list
@@ -50,9 +70,18 @@ class App():
          self.destination = destination
 
          os.replace(f"{self.directory}/{self.file_list[self.index]}" , f"{self.destination}/{self.file_list[self.index]}")
-              
-    def sort():
-        pass
+
+    def sort(self):
+        folder_and_file_list = self.get_contents()
+        folder_list = ['Apps', 'Audio', 'Code', 'Documents', 'Images', 'Videos']
+        file_list = folder_and_file_list
+
+        for folder in folder_list:
+            file_list.remove(folder)
+        
+        
+
+        
             
         
     

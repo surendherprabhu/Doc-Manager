@@ -52,9 +52,23 @@ class GUI:
         self.sort_button.bind("<ButtonPress-1>", self.on_click)
         self.sort_button.bind("<ButtonRelease-1>", self.on_release)
 
+        self.create_button = ctk.CTkButton(master=self.root, 
+                    text="SORT", 
+                    corner_radius=20,     
+                    border_width=2, 
+                    fg_color="transparent", 
+                    hover_color="#12C0DF", 
+                    border_color="#220349",
+                    command=self.sort)
+        self.sort_button.place(relx=0.5, rely=0.5, anchor="center")
+        
+        self.sort_button.bind("<Enter>", self.on_enter)
+        self.sort_button.bind("<Leave>", self.on_leave)
+        self.sort_button.bind("<ButtonPress-1>", self.on_click)
+        self.sort_button.bind("<ButtonRelease-1>", self.on_release)
+
         self.root.mainloop()
 
     def sort(self):
         self.app.sort()
 
-GUI()
