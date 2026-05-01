@@ -1,93 +1,87 @@
 import os
 from pathlib import Path
+import shutil
 
+# Default starting point
 documents_path = Path.home() / "Documents"
 
-
-
 class App():
-    def __init__(self , OS = 0 , directory = documents_path ):
+    def __init__(self, OS=0, directory=documents_path):
         self.OS = OS
-        self.directory = directory
+        self.directory = Path(directory)
+        self.path = self.directory  # Defaults to directory unless create() is called
         self.file_list = []
         self.index = 0
 
     @property
     def validate_os(self):
         if not self.OS:
-            return ("Your Operating system is valid and should support the program")
+            return "Your Operating system is valid and should support the program"
         else:
             raise SystemError("This application is only supported for windows as of now")
         
-    def create(self ,name = "Documents"):
-         directory = self.directory
-         path = os.path.join(directory,name)
-         
-
-         try:
-             os.mkdir(path)
-             print(f"Directory {name} created at {directory} successfully")
-             self.new_folder = name
-         except OSError as error:
-             print(f"Directory '{path}' could not be created: {error}")
+    def create(self, name="Organized_Files", create_subfolder=True):
+        self.path = self.directory / name
         
-         with os.scandir(path) as dir:
-             if not dir:
-                 image = os.path.join(path,"Images")
-                 os.mkdir(image)
-                 document = os.path.join(path,"Documents")
-                 os.mkdir(document)
-                 video = os.path.join(path,"Videos")
-                 os.mkdir(video)
-                 applications = os.path.join(path,"Apps")
-                 os.mkdir(applications)
-                 audio = os.path.join(path,"Audio")
-                 os.mkdir(audio)
-                 programming = os.path.join(path,"Code")
-                 os.mkdir(programming)
-             else:
-                 pass
-         self.path = path
-
+        try:
+            self.path.mkdir(parents=True, exist_ok=True)
+            print(f"Directory '{name}' created/verified at {self.directory}")
+            
+            if create_subfolder:
+                folders = ['Images', 'Documents', 'Videos', 'Apps', 'Audio', 'Code']
+                for folder in folders:
+                    (self.path / folder).mkdir(exist_ok=True)
+        except OSError as error:
+            print(f"Directory '{self.path}' could not be created: {error}")
             
     def get_contents(self):
-        self.create()
-        with os.scandir(self.path) as dir:
-            for element in dir:
-                self.file_list.append(element.name)
-            return self.file_list
+        # Refresh the list each time to avoid duplicates
+        if self.path.exists():
+            self.file_list = [f.name for f in os.scandir(self.path) if f.is_file()]
+        return self.file_list
                          
     def contents(self):
-         self.file_list_display = self.get_contents()
-         result = "The files that are in the current directory are:\n"
-         for index , file in enumerate(self.file_list_display , start=1):
-            result += f"{index}. {file}" + "\n"
-         return result
+        files = self.get_contents()
+        if not files:
+            return "The directory is empty or contains only folders."
             
-         
-    def move_file(self ,index, destination):
-         self.index = index
-         self.destination = destination
-
-         os.replace(f"{self.directory}/{self.file_list[self.index]}" , f"{self.destination}/{self.file_list[self.index]}")
+        result = "The files that are in the current directory are:\n"
+        for index, file in enumerate(files, start=1):
+            result += f"{index}. {file}\n"
+        return result
+            
+    def move_file(self, index, destination):
+        # index is 1-based from the contents() display
+        self.index = index - 1
+        self.destination = Path(destination)
+        
+        filename = self.file_list[self.index]
+        source_path = self.path / filename
+        dest_path = self.destination / filename
+        
+        shutil.move(source_path, dest_path)
+        print(f"Moved {filename} to {destination}")
 
     def sort(self):
-        folder_and_file_list = self.get_contents()
-        folder_list = ['Apps', 'Audio', 'Code', 'Documents', 'Images', 'Videos']
-        file_list = folder_and_file_list
+        # Map extensions to their target subfolders
+        extensions_map = {
+            ".jpg": "Images", ".jpeg": "Images", ".png": "Images",
+            ".docx": "Documents", ".pdf": "Documents", ".txt": "Documents",
+            ".mp4": "Videos", ".mov": "Videos",
+            ".exe": "Apps", ".msi": "Apps",
+            ".mp3": "Audio", ".wav": "Audio",
+            ".py": "Code", ".cpp": "Code", ".html": "Code"
+        }
 
-        for folder in folder_list:
-            file_list.remove(folder)
+        files = self.get_contents()
         
-        
-
-        
-            
-        
-    
-        
-
-        
-
-
-    
+        for file in files:
+            extension = Path(file).suffix.lower()
+            if extension in extensions_map:
+                target_folder = self.path / extensions_map[extension]
+                
+                # Ensure the subfolder exists before moving
+                target_folder.mkdir(exist_ok=True)
+                
+                shutil.move(self.path / file, target_folder / file)
+                print(f"Sorted: {file} -> {extensions_map[extension]}")
